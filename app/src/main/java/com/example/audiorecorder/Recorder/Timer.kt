@@ -15,6 +15,8 @@ class Timer(private val listener: OnTimerTickListener) {
     private var duration = 0L
     private val delay = 100L
 
+
+
     fun start() {
         runnable = object : Runnable {
             override fun run() {
@@ -48,5 +50,6 @@ class Timer(private val listener: OnTimerTickListener) {
     fun getTime(): String {
         return format()
     }
+
 
 }
