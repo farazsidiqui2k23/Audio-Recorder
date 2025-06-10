@@ -12,5 +12,5 @@ data class Audio(
     val audio_Name: String,
     val audio_Path: String,
     val time_Stamp: Long = System.currentTimeMillis(),
-    val duration: Long = 0
+    val duration: String
 )

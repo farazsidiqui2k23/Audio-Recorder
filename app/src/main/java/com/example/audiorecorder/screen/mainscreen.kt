@@ -100,7 +100,7 @@ fun main_scr(
     val timer = Timer(object : Timer.OnTimerTickListener {
         override fun onTimerTick(duration: String) {
             timerText = duration
-            Log.d("Timer", "Time: $duration")
+            //Log.d("Timer", "Time: $duration")
         }
     })
 
@@ -165,16 +165,12 @@ fun main_scr(
                                 colorFilter = ColorFilter.tint(foreground)
                             )
 
-                            //space for visualizer
-//                            Box(
-//                                modifier = Modifier
-//                                    .height(150.dp)
-//                                    .width(20.dp)
-//                                    .padding(0.dp, 20.dp, 0.dp, 40.dp)
-//                                    .background(Color.White)
-//
-//                            )
-                            Text(text = timerText, fontSize = 50.sp, color = Color.White, modifier = Modifier.padding(0.dp, 20.dp, 0.dp, 40.dp))
+                            Text(
+                                text = timerText,
+                                fontSize = 50.sp,
+                                color = Color.White,
+                                modifier = Modifier.padding(0.dp, 20.dp, 0.dp, 40.dp)
+                            )
                         }
                     }
 
@@ -182,9 +178,15 @@ fun main_scr(
                         onClick = {
                             if (isRecording) {
                                 // Stop recording
-                                timer.stop()
+
                                 audioRecorder.stop()
-                                audioViewModel.AddAudio(currentRecordingFile!!.name, currentRecordingFile!!.absolutePath)
+                                audioViewModel.AddAudio(
+                                    fileName = currentRecordingFile!!.name,
+                                    filePath = currentRecordingFile!!.absolutePath,
+                                    duration = timerText,
+
+                                )
+                                timer.stop()
                                 isRecording = false
                             } else {
                                 // Start recording with a unique filename
@@ -220,63 +222,20 @@ fun main_scr(
                         .padding(0.dp, 8.dp, 0.dp, 0.dp),
                     colors = CardDefaults.cardColors(Color.White),
                     elevation = CardDefaults.cardElevation(4.dp)
-                ) {//list of Recorded Audios
-
-//                    IconButton(onClick = {
-////                        mediaPlayer.setDataSource(audioFiles?.absolutePath)
-////                        mediaPlayer.prepare()
-////                        mediaPlayer.start()
-//                    }) { Text("Play") }
-
-
-
-//                    IconButton(
-//                        onClick = {
-//                            currentRecordingFile?.let { file ->
-//                                if (file.exists()) {
-//                                    if (isPlaying) {
-//                                        mediaPlayer.stop()
-//                                        mediaPlayer.reset()
-//                                        isPlaying = false
-//                                    } else {
-//                                        try {
-//                                            mediaPlayer.reset()
-//                                            mediaPlayer.setDataSource(file.absolutePath)
-//                                            mediaPlayer.prepare()
-//                                            mediaPlayer.start()
-//                                            isPlaying = true
-//                                        } catch (e: Exception) {
-//                                            Log.e("AudioPlayer", "Error playing audio", e)
-//                                        }
-//                                    }
-//                                }
-//                            }
-//                        },
-//                        enabled = currentRecordingFile != null
-//                    ) {
-//                        Text(if (isPlaying) "Stop" else "Play")
-//                    }
-
-
-
+                ) {
                     LazyColumn() {
-                        items(audios){
-                            audio ->
+                        items(audios) { audio ->
                             player_scr(
                                 recording_data = audio,
                                 viewModel = audioViewModel
                             )
                         }
                     }
-
-
-
                 }
             }
         }
     }
 }
-
 
 
 //@Preview(showSystemUi = true, device = "id:pixel_9_pro")
