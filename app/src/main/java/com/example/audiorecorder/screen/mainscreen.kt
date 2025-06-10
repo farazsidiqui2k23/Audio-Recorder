@@ -45,6 +45,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -79,9 +80,9 @@ fun main_scr(
     context: Context
 ) {
 
-    var isRecording by remember { mutableStateOf(false) }
-    var currentRecordingFile by remember { mutableStateOf<File?>(null) }
-    var isPlaying by remember { mutableStateOf(false) }
+    var isRecording by rememberSaveable { mutableStateOf(false) }
+    var currentRecordingFile by rememberSaveable { mutableStateOf<File?>(null) }
+    var isPlaying by rememberSaveable { mutableStateOf(false) }
 
     // Create media player for playback
     val mediaPlayer = remember {
@@ -94,7 +95,7 @@ fun main_scr(
 
     val audios by audioViewModel.AudioList.observeAsState(initial = emptyList())
 
-    var timerText by remember { mutableStateOf("00:00.00") }
+    var timerText by rememberSaveable { mutableStateOf("00:00.00") }
 
 
     val timer = Timer(object : Timer.OnTimerTickListener {

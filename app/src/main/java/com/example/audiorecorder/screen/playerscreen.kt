@@ -29,10 +29,12 @@ import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,30 +49,42 @@ import com.example.audiorecorder.RoomSetup.Audio
 import com.example.audiorecorder.RoomSetup.AudioViewModel
 import com.example.audiorecorder.ui.theme.background
 import com.example.audiorecorder.ui.theme.foreground
+import kotlinx.coroutines.delay
 
 @Composable
 fun player_scr(recording_data: Audio, viewModel: AudioViewModel) {
 
-    var isPlaying by remember { mutableStateOf(false) }
+    var isPlaying by rememberSaveable { mutableStateOf(false) }
 
-    var _expanded by remember { mutableStateOf(false) }
+    var _expanded by rememberSaveable { mutableStateOf(false) }
 
+    var sliderPosition by remember { mutableFloatStateOf(0f) }
+    var duration by remember{ mutableStateOf(0) }
+
+println(sliderPosition)
     // Create media player for playback
     val mediaPlayer = remember {
         MediaPlayer().apply {
             setOnCompletionListener {
                 isPlaying = false
+                sliderPosition = 0f
             }
         }
     }
-
-    var sliderPosition by remember { mutableFloatStateOf(0f) }
 
     DisposableEffect(Unit) {
         onDispose {
             mediaPlayer.release()
         }
     }
+
+    LaunchedEffect(isPlaying) {
+        while (isPlaying) {
+            sliderPosition = mediaPlayer.currentPosition.toFloat()
+            delay(100L) // Update every 100ms (smooth feel)
+        }
+    }
+
 
     Card(
         colors = CardDefaults.cardColors(foreground),
@@ -91,6 +105,9 @@ fun player_scr(recording_data: Audio, viewModel: AudioViewModel) {
                             mediaPlayer.setDataSource(recording_data.audio_Path)
                             mediaPlayer.prepare()
                             mediaPlayer.start()
+
+                            duration = mediaPlayer.duration
+
                         } catch (e: Exception) {
                             e.printStackTrace()
                             isPlaying = false
@@ -122,14 +139,14 @@ fun player_scr(recording_data: Audio, viewModel: AudioViewModel) {
 
                     Slider(
                         value = sliderPosition,
-                        onValueChange = { sliderPosition = it },
+                        onValueChange = { sliderPosition = it
+                                        mediaPlayer.seekTo(it.toInt())},
                         colors = SliderDefaults.colors(
                             thumbColor = if (isPlaying) Color.White else background,
                             activeTrackColor = background,
                             inactiveTrackColor = Color(0xFF534582),
                         ),
-                        steps = 3,
-                        valueRange = 0f..50f
+                        valueRange = 0f..duration.toFloat()
                     )
                 }
 
